@@ -1,3 +1,29 @@
 * {
     box-sizing: border-box;
 }
+
+h1 {
+    font-size: 3rem;
+    text-align: center;
+    padding: 10px;
+    margin: 20px;
+}
+
+.square {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: whitesmoke;
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
+#game-board {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    height: 35rem;
+    width: 35rem;
+    margin: 0 auto;
+    gap: 0.5rem;
+}
