@@ -18,6 +18,11 @@ h1 {
     border-radius: 5px;
 }
 
+.square:hover {
+    background-color: silver;
+    cursor: pointer;
+}
+
 #game-board {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
