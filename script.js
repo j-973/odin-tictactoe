@@ -10,7 +10,22 @@ const gameBoard = (() => {
             square.textContent = board[index];
         });
     }
-    return { render };
+
+    const clear = () => {
+        board = ['', '', '', 
+                '', '', '',
+                '', '', ''];
+    }
+
+    return { render, clear };
 })();
 
-gameBoard.render();
+const game = (() => {
+    const start = () => {
+        gameBoard.clear();
+    }
+
+return { start }
+})();
+
+game.start();
