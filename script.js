@@ -1,44 +1,88 @@
+//HOLDS LOGIC OF THE STATE OF THE GAME BOARD, AND HOW IT GETS PRINTED TO THE BROWSER CONSOLE
 const gameBoard = (() => {
-    let board = ['O', 'O', 'X',
-                'X', 'X', 'O', 
-                'O', 'X', 'X'];
+    const numOfSquares = 9;
+    const board = [];
 
-    //renders the contents of the board array to the webpage
-    const render = () => {
-        let allSquares = document.querySelectorAll('.square');
-        allSquares.forEach((square, index) => {
-            square.textContent = board[index];
-        });
-    }
+    //1 dimensional array represenation of 3 by 3 grid is 9 squares total
+    //for each board index, make a square
 
-    const clear = () => {
-        board = ['', '', '', 
-                '', '', '',
-                '', '', ''];
-    }
+    //"" empty string means empty square, no selection made yet
+    function square() {
+        let squareValue = "";
 
-    //if the game board array's location is empty, assign a marker to that board index
-    //since board is an array, location corresponds to the index num of board (0 - 8 for this board with 9 spaces)
-    const addMarker = (marker, boardLocation) => {
-        if (board[boardLocation] === "") {
-            board[boardLocation] = marker;
+        //the square is assigned the value of what player selects
+        const addMarkerSelection = (selection) => {
+            squareValue = selection;
         }
+
+        //returns the current value of squareValue for other functions that need it for filtering or printing to console
+        //would be an empty string (no selection), an X, or an O.  
+        const getSquareValue = () => squareValue;
+
+        return { addMarkerSelection, getSquareValue }
     }
 
-    return { render, clear, addMarker };
-})();
-
-//testing addMarker function by adding an X in the center of the gameboard
-const game = (() => {
-    const start = () => {
-        gameBoard.clear();
-        gameBoard.addMarker("X", 4);
-        gameBoard.render();
+    for (let i = 0; i < numOfSquares; i++) {
+        board[i] = square();
     }
 
-return { start }
+    const addMarker = (marker, boardLocation) => {
+        //filter creates new array of just squares with empty strings (to find available squares) 
+        const availableCells = board.filter(square => square.getSquareValue() === "");
+    
+        //checks if the board location is in the availableCells array and is free to place a marker onto 
+        if (availableCells.includes(board[boardLocation])) {
+            // If the location is available, add the marker to the square
+            board[boardLocation].addMarkerSelection(marker);
+        } 
+    }
+
+    const printBoardToConsole = () => {
+        //Map the board array to a new array containing just the values of the board squares
+        const boardValues = board.map(square => square.getSquareValue());
+
+        //Format the board values as a string, breaking them up and setting a new line to make tic-tac-toe grid columns
+        //i increments by 3 to add one row of the 3-by-3 grid to the formatted output at a time, starting from an empty string
+        let formattedBoard = "";
+        for (let i = 0; i < numOfSquares; i += 3) {
+            formattedBoard += `${boardValues[i]} | ${boardValues[i + 1]} | ${boardValues[i + 2]}\n`;
+        }
+    
+        console.log(formattedBoard);
+    };
+
+    return { addMarker, printBoardToConsole };
 })();
 
-game.start();
+
+//HANDLES MOVES, AND CHECKS IF THEY ARE VALID
+const Game = (() => {
+        const playRound = () => {
+            const marker = "X";
+            const playerMove = prompt(`Where do you want to place your marker? Use numbers 0 to 8, 0 being top left, and 8 being bottom right:`);
+        
+            //parse the string from the prompt to an integer so it can be used as a board location 
+            const boardLocation = parseInt(playerMove);
+
+            //checking if the move is valid
+            if (boardLocation >= 0 && boardLocation <= 8) {
+                gameBoard.addMarker(marker, boardLocation);
+                gameBoard.printBoardToConsole();
+            } else {
+                console.log(`Square ${boardLocation} is an invalid move. Please enter a number between 0 and 8.`);
+            }
+    }
+    
+    //recursive function - calls itself after calling a round, so that it indefinitely calls more rounds to play.
+    //setTimeout adds a 2 second delay between prompts
+    const play = () => {
+        playRound();
+        console.log(`Next turn...`);
+        setTimeout(play, 2000);
+        
+    }
+        return { playRound, play }
+    })();
 
 
+Game.play();
