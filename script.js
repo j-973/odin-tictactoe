@@ -2,6 +2,7 @@
 const gameBoard = (() => {
     const numOfSquares = 9;
     const board = [];
+    
 
     //1 dimensional array represenation of 3 by 3 grid is 9 squares total
     //for each board index, make a square
@@ -32,9 +33,12 @@ const gameBoard = (() => {
     
         //checks if the board location is in the availableCells array and is free to place a marker onto 
         if (availableCells.includes(board[boardLocation])) {
-            // If the location is available, add the marker to the square
             board[boardLocation].addMarkerSelection(marker);
-        } 
+            return true;
+        } else {
+            console.log(`Square ${boardLocation} is already taken. Please choose a different square.`);
+            return false;
+        }
     }
 
     const printBoardToConsole = () => {
@@ -57,32 +61,37 @@ const gameBoard = (() => {
 
 //HANDLES MOVES, AND CHECKS IF THEY ARE VALID
 const Game = (() => {
+    let turnCounter = 1; 
         const playRound = () => {
             const marker = "X";
             const playerMove = prompt(`Where do you want to place your marker? Use numbers 0 to 8, 0 being top left, and 8 being bottom right:`);
         
-            //parse the string from the prompt to an integer so it can be used as a board location 
+            //parse the string from the prompt to an integer so it can be used as a board location
             const boardLocation = parseInt(playerMove);
 
             //checking if the move is valid
             if (boardLocation >= 0 && boardLocation <= 8) {
-                gameBoard.addMarker(marker, boardLocation);
+            validMarker = gameBoard.addMarker(marker, boardLocation);
+                if (validMarker) {
                 gameBoard.printBoardToConsole();
-            } else {
-                console.log(`Square ${boardLocation} is an invalid move. Please enter a number between 0 and 8.`);
-            }
+                turnCounter++
+            } 
+        } else {
+            console.log("Number is out of range. Please choose a number between 0 and 8.")
+        }
     }
     
     //recursive function - calls itself after calling a round, so that it indefinitely calls more rounds to play.
-    //setTimeout adds a 2 second delay between prompts
     const play = () => {
         playRound();
-        console.log(`Next turn...`);
+        console.log(`Turn #${turnCounter}...`);
         setTimeout(play, 2000);
         
     }
         return { playRound, play }
-    })();
+}
+    
+)();
 
 
 Game.play();
