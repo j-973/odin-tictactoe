@@ -59,22 +59,56 @@ const gameBoard = (() => {
 })();
 
 
-//HANDLES MOVES, AND CHECKS IF THEY ARE VALID
+//HANDLES CREATION OF NEW PLAYERS, AND MANAGEMENT OF CURRENT PLAYER
+const Player = (() => {
+    //represents the player whose turn it is in the game
+    let currentPlayer;
+
+    //factory function for making new players
+    const createPlayer = (playerName, markerType) => {
+        return { playerName, markerType }
+    }
+    
+    //these two functions allow the currentPlayer value to be retrieved, or assigned a new value, from other modules while keeping currentPlayer itself private 
+    //helps keep code readable and organzied
+    const getCurrentPlayer = () => currentPlayer;
+    const setCurrentPlayer = (player) => currentPlayer = player;
+    
+    return { createPlayer, getCurrentPlayer, setCurrentPlayer }
+})();
+    
+//HANDLES MOVES AND TURNS, AND CHECKS IF THEY ARE VALID
 const Game = (() => {
     let turnCounter = 1; 
+
+    const playerOne = Player.createPlayer("Player One", "X");
+    const playerTwo = Player.createPlayer("Player Two", "O");
+        
+        //starting the game as Player One
+        Player.setCurrentPlayer(playerOne);
+
+        const switchTurns = () => {
+            if (Player.getCurrentPlayer() === playerOne) {
+                Player.setCurrentPlayer(playerTwo);
+            } 
+            else if (Player.getCurrentPlayer() === playerTwo) {
+                Player.setCurrentPlayer(playerOne);
+            };
+        }
+
         const playRound = () => {
-            const marker = "X";
-            const playerMove = prompt(`Where do you want to place your marker? Use numbers 0 to 8, 0 being top left, and 8 being bottom right:`);
+            const playerMove = prompt(`${Player.getCurrentPlayer().playerName}, where do you want to place your marker? Use numbers 0 to 8, 0 being top left, and 8 being bottom right:`);
         
             //parse the string from the prompt to an integer so it can be used as a board location
             const boardLocation = parseInt(playerMove);
 
             //checking if the move is valid
             if (boardLocation >= 0 && boardLocation <= 8) {
-            validMarker = gameBoard.addMarker(marker, boardLocation);
+            validMarker = gameBoard.addMarker(Player.getCurrentPlayer().markerType, boardLocation);
                 if (validMarker) {
                 gameBoard.printBoardToConsole();
                 turnCounter++
+                switchTurns();
             } 
         } else {
             console.log("Number is out of range. Please choose a number between 0 and 8.")
@@ -92,6 +126,5 @@ const Game = (() => {
 }
     
 )();
-
 
 Game.play();
