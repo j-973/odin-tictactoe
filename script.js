@@ -1,3 +1,4 @@
+"use strict"
 //HOLDS LOGIC OF THE STATE OF THE GAME BOARD, AND HOW IT GETS PRINTED TO THE BROWSER CONSOLE
 const gameBoard = (() => {
     const numOfSquares = 9;
@@ -31,9 +32,45 @@ const gameBoard = (() => {
         //filter creates new array of just squares with empty strings (to find available squares) 
         const availableCells = board.filter(square => square.getSquareValue() === "");
     
-        //checks if the board location is in the availableCells array and is free to place a marker onto 
+        //checks if the board location is in the availableCells array and is free to place a marker onto
+
+        //Each board index has a corresponding value that adds to each player's magicSum. 3 in a row sum up to 15 in any direction
+        // For this configuration, 15 is the magic constant to reach
         if (availableCells.includes(board[boardLocation])) {
             board[boardLocation].addMarkerSelection(marker);
+
+            let currentPlayer = Player.getCurrentPlayer();
+            let magicSum = currentPlayer.getMagicSum();
+            switch (boardLocation) {
+                case 0:
+                currentPlayer.setMagicSum(magicSum + 2);
+                    break;
+                case 1:
+                currentPlayer.setMagicSum(magicSum + 7);
+                    break;
+                case 2:
+                currentPlayer.setMagicSum(magicSum + 6);
+                    break;
+                case 3:
+                currentPlayer.setMagicSum(magicSum + 9);
+                    break;
+                case 4:
+                currentPlayer.setMagicSum(magicSum + 5);
+                    break;
+                case 5:
+                currentPlayer.setMagicSum(magicSum + 1);
+                    break;
+                case 6:
+                currentPlayer.setMagicSum(magicSum + 4);
+                    break;
+                case 7:
+                currentPlayer.setMagicSum(magicSum + 3);
+                    break;
+                case 8:
+                currentPlayer.setMagicSum(magicSum + 8);
+                    break;
+            }
+
             return true;
         } else {
             console.log(`Square ${boardLocation} is already taken. Please choose a different square.`);
@@ -63,31 +100,37 @@ const gameBoard = (() => {
 const Player = (() => {
     //represents the player whose turn it is in the game
     let currentPlayer;
-
+    
     //factory function for making new players
-    const createPlayer = (playerName, markerType) => {
-        return { playerName, markerType }
+    const createPlayer = (playerName, markerType, magicSum) => {
+        //retrieve or add to the magicSum of each individually created Player
+        const getMagicSum = () => magicSum;
+        const setMagicSum = (amount) => magicSum = amount;
+
+        return { playerName, markerType, getMagicSum, setMagicSum }
     }
     
     //these two functions allow the currentPlayer value to be retrieved, or assigned a new value, from other modules while keeping currentPlayer itself private 
     //helps keep code readable and organzied
     const getCurrentPlayer = () => currentPlayer;
     const setCurrentPlayer = (player) => currentPlayer = player;
-    
+
     return { createPlayer, getCurrentPlayer, setCurrentPlayer }
 })();
     
 //HANDLES MOVES AND TURNS, AND CHECKS IF THEY ARE VALID
 const Game = (() => {
-    let turnCounter = 1; 
+    let turnCounter = 1;
+    const magicConst = 15; 
 
-    const playerOne = Player.createPlayer("Player One", "X");
-    const playerTwo = Player.createPlayer("Player Two", "O");
+    const playerOne = Player.createPlayer("Player One", "X", 0);
+    const playerTwo = Player.createPlayer("Player Two", "O", 0);
         
         //starting the game as Player One
         Player.setCurrentPlayer(playerOne);
 
         const switchTurns = () => {
+        console.log(`Turn #${turnCounter}...`);
             if (Player.getCurrentPlayer() === playerOne) {
                 Player.setCurrentPlayer(playerTwo);
             } 
@@ -96,35 +139,48 @@ const Game = (() => {
             };
         }
 
+        //
+        const checkWinner = () => {
+            if (Player.getCurrentPlayer().getMagicSum() === magicConst) {
+                return true;
+            }
+        else return false;
+        
+        }
+
         const playRound = () => {
             const playerMove = prompt(`${Player.getCurrentPlayer().playerName}, where do you want to place your marker? Use numbers 0 to 8, 0 being top left, and 8 being bottom right:`);
         
             //parse the string from the prompt to an integer so it can be used as a board location
             const boardLocation = parseInt(playerMove);
-
+        
             //checking if the move is valid
             if (boardLocation >= 0 && boardLocation <= 8) {
-            validMarker = gameBoard.addMarker(Player.getCurrentPlayer().markerType, boardLocation);
+            const validMarker = gameBoard.addMarker(Player.getCurrentPlayer().markerType, boardLocation);
                 if (validMarker) {
                 gameBoard.printBoardToConsole();
+                //before switching turns, check for a winner
+                if (checkWinner()) {
+                    console.log(`${Player.getCurrentPlayer().playerName} wins the game!!`);
+                    return;
+                }
                 turnCounter++
                 switchTurns();
             } 
         } else {
             console.log("Number is out of range. Please choose a number between 0 and 8.")
         }
-    }
     
-    //recursive function - calls itself after calling a round, so that it indefinitely calls more rounds to play.
+        setTimeout(playRound, 2000);
+    }
+
+    //playRound is a recursive function, calling itself indefinitely with a 2 second timeout delay after each round until a winner is found
     const play = () => {
         playRound();
-        console.log(`Turn #${turnCounter}...`);
-        setTimeout(play, 2000);
-        
     }
-        return { playRound, play }
-}
-    
-)();
+
+    return { playRound, checkWinner, play }
+
+})();
 
 Game.play();
