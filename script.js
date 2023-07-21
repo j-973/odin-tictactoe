@@ -28,15 +28,14 @@ const gameBoard = (() => {
         board[i] = square();
     }
 
-    const addMarker = (marker, boardLocation) => {
-        //filter creates new array of just squares with empty strings (to find available squares) 
-        const availableCells = board.filter(square => square.getSquareValue() === "");
-    
-        //checks if the board location is in the availableCells array and is free to place a marker onto
+    //filter creates new array of just squares with empty strings (to find available squares) 
+    const getAvailableCells = () => board.filter(square => square.getSquareValue() === "");
 
+    const addMarker = (marker, boardLocation) => {
+        //checks if the board location is in the availableCells array and is free to place a marker onto
         //Each board index has a corresponding value that adds to each player's magicSum. 3 in a row sum up to 15 in any direction
         // For this configuration, 15 is the magic constant to reach
-        if (availableCells.includes(board[boardLocation])) {
+        if (getAvailableCells().includes(board[boardLocation])) {
             board[boardLocation].addMarkerSelection(marker);
 
             let currentPlayer = Player.getCurrentPlayer();
@@ -72,10 +71,10 @@ const gameBoard = (() => {
             }
 
             return true;
-        } else {
+        } else if (!getAvailableCells().includes(board[boardLocation])) {
             console.log(`Square ${boardLocation} is already taken. Please choose a different square.`);
             return false;
-        }
+        } 
     }
 
     const printBoardToConsole = () => {
@@ -92,7 +91,7 @@ const gameBoard = (() => {
         console.log(formattedBoard);
     };
 
-    return { addMarker, printBoardToConsole };
+    return { addMarker, getAvailableCells, printBoardToConsole };
 })();
 
 
@@ -139,16 +138,27 @@ const Game = (() => {
             };
         }
 
-        //
+        //if there are no available spaces, game is a draw
+        const checkDraw = () => {
+            if (gameBoard.getAvailableCells().length === 0) {
+            console.log("All squares filled. Game is a draw.");
+            return true;
+        } 
+        else return false;
+    }
+        
         const checkWinner = () => {
             if (Player.getCurrentPlayer().getMagicSum() === magicConst) {
                 return true;
             }
-        else return false;
+            else return false;
         
         }
 
         const playRound = () => {
+            //if there is a draw, return to exit the function
+            if (checkDraw()) return;
+
             const playerMove = prompt(`${Player.getCurrentPlayer().playerName}, where do you want to place your marker? Use numbers 0 to 8, 0 being top left, and 8 being bottom right:`);
         
             //parse the string from the prompt to an integer so it can be used as a board location
