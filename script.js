@@ -129,26 +129,27 @@ const Game = (() => {
         Player.setCurrentPlayer(playerOne);
 
         const switchTurns = () => {
-        console.log(`Turn #${turnCounter}...`);
+        console.log(`- Turn #${turnCounter} -`);
             if (Player.getCurrentPlayer() === playerOne) {
                 Player.setCurrentPlayer(playerTwo);
             } 
             else if (Player.getCurrentPlayer() === playerTwo) {
                 Player.setCurrentPlayer(playerOne);
             };
+            console.log(`${Player.getCurrentPlayer().playerName}'s turn...`)
         }
 
-        //if there are no available spaces, game is a draw
+        //if there are no available spaces, and no player has reached the magic const then game is a draw
         const checkDraw = () => {
-            if (gameBoard.getAvailableCells().length === 0) {
-            console.log("All squares filled. Game is a draw.");
+            if (gameBoard.getAvailableCells().length === 0 && (playerOne.getMagicSum() !== magicConst) && (playerTwo.getMagicSum() !== magicConst)) {
+            console.log("Game is a draw.");
             return true;
         } 
         else return false;
     }
         
         const checkWinner = () => {
-            if (Player.getCurrentPlayer().getMagicSum() === magicConst) {
+            if (playerOne.getMagicSum() === magicConst || playerTwo.getMagicSum() === magicConst) {
                 return true;
             }
             else return false;
@@ -156,9 +157,17 @@ const Game = (() => {
         }
 
         const playRound = () => {
-            //if there is a draw, return to exit the function
-            if (checkDraw()) return;
-
+            //if there is a winner or a draw, stop playing rounds
+            if (checkWinner() || checkDraw()) return;
+            
+            //print game title and blank board on the first turn
+            if (turnCounter === 1) {
+                console.log(`-- TIC-TAC-TOE --`);
+                console.log(`- Turn ${turnCounter} -`)
+                console.log(`${Player.getCurrentPlayer().playerName}'s turn...`)
+                gameBoard.printBoardToConsole(); 
+            }
+            
             const playerMove = prompt(`${Player.getCurrentPlayer().playerName}, where do you want to place your marker? Use numbers 0 to 8, 0 being top left, and 8 being bottom right:`);
         
             //parse the string from the prompt to an integer so it can be used as a board location
@@ -186,6 +195,9 @@ const Game = (() => {
 
     //playRound is a recursive function, calling itself indefinitely with a 2 second timeout delay after each round until a winner is found
     const play = () => {
+        if (turnCounter === 1) {
+            setTimeout(playRound, 1500);
+        }
         playRound();
     }
 
