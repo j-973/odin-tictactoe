@@ -139,15 +139,6 @@ const Game = (() => {
             console.log(`${Player.getCurrentPlayer().playerName}'s turn...`)
         }
 
-        //if there are no available spaces, and no player has reached the magic const then game is a draw
-        const checkDraw = () => {
-            if (gameBoard.getAvailableCells().length === 0 && (playerOne.getMagicSum() !== magicConst) && (playerTwo.getMagicSum() !== magicConst)) {
-            console.log("Game is a draw.");
-            return true;
-        } 
-        else return false;
-    }
-        
         const checkWinner = () => {
             if (playerOne.getMagicSum() === magicConst || playerTwo.getMagicSum() === magicConst) {
                 return true;
@@ -156,10 +147,18 @@ const Game = (() => {
         
         }
 
+        //if there are no available spaces, and no player has reached the magic const then game is a draw
+        const checkDraw = () => {
+            if (gameBoard.getAvailableCells().length === 0 && (playerOne.getMagicSum() !== magicConst) && (playerTwo.getMagicSum() !== magicConst)) {
+            return true;
+        } 
+        else return false;
+    }
+        
         const playRound = () => {
             //if there is a winner or a draw, stop playing rounds
             if (checkWinner() || checkDraw()) return;
-            
+
             //print game title and blank board on the first turn
             if (turnCounter === 1) {
                 console.log(`-- TIC-TAC-TOE --`);
@@ -178,9 +177,13 @@ const Game = (() => {
             const validMarker = gameBoard.addMarker(Player.getCurrentPlayer().markerType, boardLocation);
                 if (validMarker) {
                 gameBoard.printBoardToConsole();
-                //before switching turns, check for a winner
+                //checking for winner or draw before switching turns
                 if (checkWinner()) {
                     console.log(`${Player.getCurrentPlayer().playerName} wins the game!!`);
+                    return;
+                }
+                if (checkDraw()) {
+                    console.log(`Game is a draw.`);
                     return;
                 }
                 turnCounter++
