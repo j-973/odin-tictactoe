@@ -69,7 +69,7 @@ const gameBoard = (() => {
                 currentPlayer.setMagicSum(magicSum + 8);
                     break;
             }
-
+            console.log(`${currentPlayer.playerName} places an ${marker} at square ${boardLocation}.`)
             return true;
         } else if (!getAvailableCells().includes(board[boardLocation])) {
             console.log(`Square ${boardLocation} is already taken. Please choose a different square.`);
@@ -121,9 +121,17 @@ const Player = (() => {
 const Game = (() => {
     let turnCounter = 1;
     const magicConst = 15; 
+    let playerOneName = "";
+    let playerTwoName = "";
 
-    const playerOne = Player.createPlayer("Player One", "X", 0);
-    const playerTwo = Player.createPlayer("Player Two", "O", 0);
+    while (playerOneName === "" || playerOneName.includes(" ")) {
+        playerOneName = prompt(`Welcome to Tic-Tac-Toe! Enter a name for Player One:`);
+    }
+    while (playerTwoName === "" || playerTwoName.includes(" ")) {
+        playerTwoName = prompt(`Welcome to Tic-Tac-Toe! Enter a name for Player Two:`);
+    }
+    const playerOne = Player.createPlayer(playerOneName, "X", 0);
+    const playerTwo = Player.createPlayer(playerTwoName, "O", 0);
         
         //starting the game as Player One
         Player.setCurrentPlayer(playerOne);
@@ -162,6 +170,8 @@ const Game = (() => {
             //print game title and blank board on the first turn
             if (turnCounter === 1) {
                 console.log(`-- TIC-TAC-TOE --`);
+                console.log(`Player One: ${playerOneName}`);
+                console.log(`Player Two: ${playerTwoName}`);
                 console.log(`- Turn ${turnCounter} -`)
                 console.log(`${Player.getCurrentPlayer().playerName}'s turn...`)
                 gameBoard.printBoardToConsole(); 
@@ -179,7 +189,7 @@ const Game = (() => {
                 gameBoard.printBoardToConsole();
                 //checking for winner or draw before switching turns
                 if (checkWinner()) {
-                    console.log(`${Player.getCurrentPlayer().playerName} wins the game!!`);
+                    console.log(`${Player.getCurrentPlayer().playerName} wins the game. Congratulations!!`);
                     return;
                 }
                 if (checkDraw()) {
