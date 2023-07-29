@@ -31,45 +31,44 @@ const gameBoard = (() => {
     //filter creates new array of just squares with empty strings (to find available squares) 
     const getAvailableCells = () => board.filter(square => square.getSquareValue() === "");
 
-    const addMarker = (marker, boardLocation) => {
+    const addMarker = (marker, boardLocation, magicSum, setMagicSum) => {
         //checks if the board location is in the availableCells array and is free to place a marker onto
         //Each board index has a corresponding value that adds to each player's magicSum. 3 in a row sum up to 15 in any direction
         // For this configuration, 15 is the magic constant to reach
         if (getAvailableCells().includes(board[boardLocation])) {
-            board[boardLocation].addMarkerSelection(marker);
-
-            let currentPlayer = Player.getCurrentPlayer();
-            let magicSum = currentPlayer.getMagicSum();
+            board[boardLocation].addMarkerSelection(marker); 
+            
             switch (boardLocation) {
                 case 0:
-                currentPlayer.setMagicSum(magicSum + 2);
+                setMagicSum(magicSum + 2);
                     break;
                 case 1:
-                currentPlayer.setMagicSum(magicSum + 7);
+                setMagicSum(magicSum + 7);
                     break;
                 case 2:
-                currentPlayer.setMagicSum(magicSum + 6);
+                setMagicSum(magicSum + 6);
                     break;
                 case 3:
-                currentPlayer.setMagicSum(magicSum + 9);
+                setMagicSum(magicSum + 9);
                     break;
                 case 4:
-                currentPlayer.setMagicSum(magicSum + 5);
+                setMagicSum(magicSum + 5);
                     break;
                 case 5:
-                currentPlayer.setMagicSum(magicSum + 1);
+                setMagicSum(magicSum + 1);
                     break;
                 case 6:
-                currentPlayer.setMagicSum(magicSum + 4);
+                setMagicSum(magicSum + 4);
                     break;
                 case 7:
-                currentPlayer.setMagicSum(magicSum + 3);
+                setMagicSum(magicSum + 3);
                     break;
                 case 8:
-                currentPlayer.setMagicSum(magicSum + 8);
+                setMagicSum(magicSum + 8);
                     break;
+
             }
-            console.log(`${currentPlayer.playerName} places an ${marker} at square ${boardLocation}.`)
+            console.log(`${marker} placed at square ${boardLocation}.`)
             return true;
         } else if (!getAvailableCells().includes(board[boardLocation])) {
             console.log(`Square ${boardLocation} is already taken. Please choose a different square.`);
@@ -95,34 +94,27 @@ const gameBoard = (() => {
 })();
 
 
-//HANDLES CREATION OF NEW PLAYERS, AND MANAGEMENT OF CURRENT PLAYER
-const Player = (() => {
-    //represents the player whose turn it is in the game
-    let currentPlayer;
-    
-    //factory function for making new players
-    const createPlayer = (playerName, markerType, magicSum) => {
-        //retrieve or add to the magicSum of each individually created Player
-        const getMagicSum = () => magicSum;
-        const setMagicSum = (amount) => magicSum = amount;
-
-        return { playerName, markerType, getMagicSum, setMagicSum }
-    }
-    
-    //these two functions allow the currentPlayer value to be retrieved, or assigned a new value, from other modules while keeping currentPlayer itself private 
-    //helps keep code readable and organzied
-    const getCurrentPlayer = () => currentPlayer;
-    const setCurrentPlayer = (player) => currentPlayer = player;
-
-    return { createPlayer, getCurrentPlayer, setCurrentPlayer }
-})();
-    
 //HANDLES MOVES AND TURNS, AND CHECKS IF THEY ARE VALID
 const Game = (() => {
     let turnCounter = 1;
-    const magicConst = 15; 
+    const magicConst = 15;
+    let currentPlayer; 
     let playerOneName = "";
     let playerTwoName = "";
+
+        //factory function for making new players
+        const createPlayer = (playerName, markerType, magicSum) => {
+            //retrieve or add to the magicSum of each individually created Player
+            const getMagicSum = () => magicSum;
+            const setMagicSum = (amount) => magicSum = amount;
+    
+            return { playerName, markerType, getMagicSum, setMagicSum }
+        }
+        
+        //these two functions allow the currentPlayer value to be retrieved, or assigned a new value, from other modules while keeping currentPlayer itself private 
+        //helps keep code readable and organzied
+        const getCurrentPlayer = () => currentPlayer;
+        const setCurrentPlayer = (player) => currentPlayer = player;
 
     while (playerOneName === "" || playerOneName.includes(" ")) {
         playerOneName = prompt(`Welcome to Tic-Tac-Toe! Enter a name for Player One:`);
@@ -130,21 +122,21 @@ const Game = (() => {
     while (playerTwoName === "" || playerTwoName.includes(" ")) {
         playerTwoName = prompt(`Welcome to Tic-Tac-Toe! Enter a name for Player Two:`);
     }
-    const playerOne = Player.createPlayer(playerOneName, "X", 0);
-    const playerTwo = Player.createPlayer(playerTwoName, "O", 0);
+    const playerOne = createPlayer(playerOneName, "X", 0);
+    const playerTwo = createPlayer(playerTwoName, "O", 0);
         
         //starting the game as Player One
-        Player.setCurrentPlayer(playerOne);
+        setCurrentPlayer(playerOne);
 
         const switchTurns = () => {
         console.log(`- Turn #${turnCounter} -`);
-            if (Player.getCurrentPlayer() === playerOne) {
-                Player.setCurrentPlayer(playerTwo);
+            if (getCurrentPlayer() === playerOne) {
+                setCurrentPlayer(playerTwo);
             } 
-            else if (Player.getCurrentPlayer() === playerTwo) {
-                Player.setCurrentPlayer(playerOne);
+            else if (getCurrentPlayer() === playerTwo) {
+                setCurrentPlayer(playerOne);
             };
-            console.log(`${Player.getCurrentPlayer().playerName}'s turn...`)
+            console.log(`${getCurrentPlayer().playerName}'s turn...`)
         }
 
         const checkWinner = () => {
@@ -154,7 +146,6 @@ const Game = (() => {
             else return false;
         
         }
-
         //if there are no available spaces, and no player has reached the magic const then game is a draw
         const checkDraw = () => {
             if (gameBoard.getAvailableCells().length === 0 && (playerOne.getMagicSum() !== magicConst) && (playerTwo.getMagicSum() !== magicConst)) {
@@ -173,23 +164,29 @@ const Game = (() => {
                 console.log(`Player One: ${playerOneName}`);
                 console.log(`Player Two: ${playerTwoName}`);
                 console.log(`- Turn ${turnCounter} -`)
-                console.log(`${Player.getCurrentPlayer().playerName}'s turn...`)
+                console.log(`${getCurrentPlayer().playerName}'s turn...`)
                 gameBoard.printBoardToConsole(); 
             }
             
-            const playerMove = prompt(`${Player.getCurrentPlayer().playerName}, where do you want to place your marker? Use numbers 0 to 8, 0 being top left, and 8 being bottom right:`);
+            const playerMove = prompt(`${getCurrentPlayer().playerName}, where do you want to place your marker? Use numbers 0 to 8, 0 being top left, and 8 being bottom right:`);
         
             //parse the string from the prompt to an integer so it can be used as a board location
             const boardLocation = parseInt(playerMove);
         
             //checking if the move is valid
             if (boardLocation >= 0 && boardLocation <= 8) {
-            const validMarker = gameBoard.addMarker(Player.getCurrentPlayer().markerType, boardLocation);
+            const validMarker = gameBoard.addMarker(
+                getCurrentPlayer().markerType, 
+                boardLocation,
+                getCurrentPlayer().getMagicSum(),
+                getCurrentPlayer().setMagicSum
+                );
+
                 if (validMarker) {
                 gameBoard.printBoardToConsole();
                 //checking for winner or draw before switching turns
                 if (checkWinner()) {
-                    console.log(`${Player.getCurrentPlayer().playerName} wins the game. Congratulations!!`);
+                    console.log(`${getCurrentPlayer().playerName} wins the game. Congratulations!!`);
                     return;
                 }
                 if (checkDraw()) {
