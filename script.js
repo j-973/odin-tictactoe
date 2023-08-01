@@ -29,13 +29,13 @@ const gameBoard = (() => {
     }
 
     //filter creates new array of just squares with empty strings (to find available squares) 
-    const getAvailableCells = () => board.filter(square => square.getSquareValue() === "");
+    const getAvailableSquares = () => board.filter(square => square.getSquareValue() === "");
 
     const addMarker = (marker, boardLocation, magicSum, setMagicSum) => {
         //checks if the board location is in the availableCells array and is free to place a marker onto
         //Each board index has a corresponding value that adds to each player's magicSum. 3 in a row sum up to 15 in any direction
         // For this configuration, 15 is the magic constant to reach
-        if (getAvailableCells().includes(board[boardLocation])) {
+        if (getAvailableSquares().includes(board[boardLocation])) {
             board[boardLocation].addMarkerSelection(marker); 
             
             switch (boardLocation) {
@@ -70,7 +70,7 @@ const gameBoard = (() => {
             }
             console.log(`${marker} placed at square ${boardLocation}.`)
             return true;
-        } else if (!getAvailableCells().includes(board[boardLocation])) {
+        } else if (!getAvailableSquares().includes(board[boardLocation])) {
             console.log(`Square ${boardLocation} is already taken. Please choose a different square.`);
             return false;
         } 
@@ -90,7 +90,7 @@ const gameBoard = (() => {
         console.log(formattedBoard);
     };
 
-    return { addMarker, getAvailableCells, printBoardToConsole };
+    return { addMarker, getAvailableSquares, printBoardToConsole };
 })();
 
 
@@ -148,7 +148,7 @@ const Game = (() => {
         }
         //if there are no available spaces, and no player has reached the magic const then game is a draw
         const checkDraw = () => {
-            if (gameBoard.getAvailableCells().length === 0 && (playerOne.getMagicSum() !== magicConst) && (playerTwo.getMagicSum() !== magicConst)) {
+            if (gameBoard.getAvailableSquares().length === 0 && (playerOne.getMagicSum() !== magicConst) && (playerTwo.getMagicSum() !== magicConst)) {
             return true;
         } 
         else return false;
