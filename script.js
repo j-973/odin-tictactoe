@@ -28,46 +28,16 @@ const gameBoard = (() => {
         board[i] = square();
     }
 
+    //Map the board array to a new array containing just the values of the board squares
+    const getBoardValues = () => board.map(square => square.getSquareValue());
+    
     //filter creates new array of just squares with empty strings (to find available squares) 
     const getAvailableSquares = () => board.filter(square => square.getSquareValue() === "");
 
-    const addMarker = (marker, boardLocation, magicSum, setMagicSum) => {
+    const addMarker = (marker, boardLocation) => {
         //checks if the board location is in the availableCells array and is free to place a marker onto
-        //Each board index has a corresponding value that adds to each player's magicSum. 3 in a row sum up to 15 in any direction
-        // For this configuration, 15 is the magic constant to reach
         if (getAvailableSquares().includes(board[boardLocation])) {
             board[boardLocation].addMarkerSelection(marker); 
-            
-            switch (boardLocation) {
-                case 0:
-                setMagicSum(magicSum + 2);
-                    break;
-                case 1:
-                setMagicSum(magicSum + 7);
-                    break;
-                case 2:
-                setMagicSum(magicSum + 6);
-                    break;
-                case 3:
-                setMagicSum(magicSum + 9);
-                    break;
-                case 4:
-                setMagicSum(magicSum + 5);
-                    break;
-                case 5:
-                setMagicSum(magicSum + 1);
-                    break;
-                case 6:
-                setMagicSum(magicSum + 4);
-                    break;
-                case 7:
-                setMagicSum(magicSum + 3);
-                    break;
-                case 8:
-                setMagicSum(magicSum + 8);
-                    break;
-
-            }
             console.log(`${marker} placed at square ${boardLocation}.`)
             return true;
         } else if (!getAvailableSquares().includes(board[boardLocation])) {
@@ -77,38 +47,30 @@ const gameBoard = (() => {
     }
 
     const printBoardToConsole = () => {
-        //Map the board array to a new array containing just the values of the board squares
-        const boardValues = board.map(square => square.getSquareValue());
-
         //Format the board values as a string, breaking them up and setting a new line to make tic-tac-toe grid columns
         //i increments by 3 to add one row of the 3-by-3 grid to the formatted output at a time, starting from an empty string
         let formattedBoard = "";
         for (let i = 0; i < numOfSquares; i += 3) {
-            formattedBoard += `${boardValues[i]} | ${boardValues[i + 1]} | ${boardValues[i + 2]}\n`;
+            formattedBoard += `${getBoardValues()[i]} | ${getBoardValues()[i + 1]} | ${getBoardValues()[i + 2]}\n`;
         }
     
         console.log(formattedBoard);
     };
 
-    return { addMarker, getAvailableSquares, printBoardToConsole };
+    return { addMarker, getBoardValues, getAvailableSquares, printBoardToConsole };
 })();
 
 
 //HANDLES MOVES AND TURNS, AND CHECKS IF THEY ARE VALID
 const Game = (() => {
     let turnCounter = 1;
-    const magicConst = 15;
     let currentPlayer; 
     let playerOneName = "";
     let playerTwoName = "";
 
         //factory function for making new players
-        const createPlayer = (playerName, markerType, magicSum) => {
-            //retrieve or add to the magicSum of each individually created Player
-            const getMagicSum = () => magicSum;
-            const setMagicSum = (amount) => magicSum = amount;
-    
-            return { playerName, markerType, getMagicSum, setMagicSum }
+        const createPlayer = (playerName, markerType) => {
+            return { playerName, markerType }
         }
         
         //these two functions allow the currentPlayer value to be retrieved, or assigned a new value, from other modules while keeping currentPlayer itself private 
@@ -140,15 +102,36 @@ const Game = (() => {
         }
 
         const checkWinner = () => {
-            if (playerOne.getMagicSum() === magicConst || playerTwo.getMagicSum() === magicConst) {
-                return true;
+            const boardValues = gameBoard.getBoardValues();
+            const winCombos = [
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+
+                [0, 3, 6],
+                [1, 4, 7],
+                [2, 5, 8],
+
+                [0, 4, 8],
+                [6, 4, 2]
+            ];
+            for (let i = 0; i < winCombos.length; i++) {
+                //iterating through each sub-array of horizontal, vertical, and diagonal winning combos
+                const a = winCombos[i][0];
+                const b = winCombos[i][1];
+                const c = winCombos[i][2];
+
+                //checking to see if the same marker is 3 in a row -- a, b, and c
+                if (boardValues[a] && boardValues[a] === boardValues[b] && boardValues[a] === boardValues[c]) {
+                    return true;
+                }
             }
-            else return false;
-        
+            return false;
         }
-        //if there are no available spaces, and no player has reached the magic const then game is a draw
+    
+        //if there are no available spaces, and no player has won, then game is a draw
         const checkDraw = () => {
-            if (gameBoard.getAvailableSquares().length === 0 && (playerOne.getMagicSum() !== magicConst) && (playerTwo.getMagicSum() !== magicConst)) {
+            if (gameBoard.getAvailableSquares().length === 0 && !checkWinner()) {
             return true;
         } 
         else return false;
@@ -175,13 +158,7 @@ const Game = (() => {
         
             //checking if the move is valid
             if (boardLocation >= 0 && boardLocation <= 8) {
-            const validMarker = gameBoard.addMarker(
-                getCurrentPlayer().markerType, 
-                boardLocation,
-                getCurrentPlayer().getMagicSum(),
-                getCurrentPlayer().setMagicSum
-                );
-
+            const validMarker = gameBoard.addMarker(getCurrentPlayer().markerType, boardLocation);
                 if (validMarker) {
                 gameBoard.printBoardToConsole();
                 //checking for winner or draw before switching turns
