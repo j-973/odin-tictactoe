@@ -47,7 +47,7 @@ const gameBoard = (() => {
     }
 
     const printBoardToConsole = () => {
-        //Format the board values as a string, breaking them up and setting a new line to make tic-tac-toe grid columns
+        //Format the board values as a string, breaking them up and setting a new line to make tic-tac-toe grid squares
         //i increments by 3 to add one row of the 3-by-3 grid to the formatted output at a time, starting from an empty string
         let formattedBoard = "";
         for (let i = 0; i < numOfSquares; i += 3) {
@@ -59,7 +59,6 @@ const gameBoard = (() => {
 
     return { addMarker, getBoardValues, getAvailableSquares, printBoardToConsole };
 })();
-
 
 //HANDLES MOVES AND TURNS, AND CHECKS IF THEY ARE VALID
 const Game = (() => {
@@ -137,7 +136,7 @@ const Game = (() => {
         else return false;
     }
         
-        const playRound = () => {
+        const playRound = (playerMove) => {
             //if there is a winner or a draw, stop playing rounds
             if (checkWinner() || checkDraw()) return;
 
@@ -151,8 +150,6 @@ const Game = (() => {
                 gameBoard.printBoardToConsole(); 
             }
             
-            const playerMove = prompt(`${getCurrentPlayer().playerName}, where do you want to place your marker? Use numbers 0 to 8, 0 being top left, and 8 being bottom right:`);
-        
             //parse the string from the prompt to an integer so it can be used as a board location
             const boardLocation = parseInt(playerMove);
         
@@ -177,7 +174,6 @@ const Game = (() => {
             console.log("Number is out of range. Please choose a number between 0 and 8.")
         }
     
-        setTimeout(playRound, 2000);
     }
 
     //playRound is a recursive function, calling itself indefinitely with a 2 second timeout delay after each round until a winner is found
@@ -188,8 +184,65 @@ const Game = (() => {
         playRound();
     }
 
-    return { playRound, checkWinner, play }
-
+    return { getCurrentPlayer, setCurrentPlayer, checkWinner, checkDraw, playRound, play }
 })();
 
-Game.play();
+//HANDLES THE GRAPHICAL USER INTERFACE AND UPDATING THE SCREEN
+const displayController = (() => {
+    const divTurn = document.querySelector('#player-turns');
+    const divBoard = document.querySelector('#game-board');
+    const divGameOver = document.querySelector(`#game-over`);
+
+    const clearScreen = () => {
+        divTurn.textContent = "";
+        divBoard.textContent = "";
+        divGameOver.textContent = "";
+    }
+
+    const updateScreen = () => {
+      //clears the board and shows the most recent turn
+      clearScreen();
+      divTurn.textContent = `${Game.getCurrentPlayer().playerName}'s turn...`
+
+      if (Game.checkWinner()) {
+        clearScreen();
+        divGameOver.textContent = `${Game.getCurrentPlayer().playerName} wins the game. Congratulations!!`;
+        return;
+    }
+    if (Game.checkDraw()) {
+        clearScreen();
+        divGameOver.textContent = `Game is a draw.`;
+        return;
+    }
+
+    //renders the contents of the board array to the webpage
+    //Using data attribute to associate each square with the corresponding board button for clicking
+        gameBoard.getBoardValues().forEach((currentValue, index) => {
+              const btnSquare = document.createElement("button");
+
+              btnSquare.classList.add("square");
+              btnSquare.dataset.square = index; 
+
+              btnSquare.textContent = currentValue;
+
+              divBoard.appendChild(btnSquare);
+          })
+        }
+
+    //Handler to place moves/markers for each round wherever the player clicks
+    const handleBoardClicks = (ev) => {
+      const playerMove = ev.target.dataset.square;
+      
+      //if the blank space around the board squares is clicked, don't make a move
+      if (!playerMove) return;
+      
+      Game.playRound(playerMove);
+      updateScreen();
+    }
+
+    divBoard.addEventListener("click", handleBoardClicks);
+
+    //intially rendering the screen
+    updateScreen();
+    
+})();
