@@ -199,22 +199,22 @@ const displayController = (() => {
         divGameOver.textContent = "";
     }
 
-    const updateScreen = () => {
-      //clears the board and shows the most recent turn
-      clearScreen();
+    const clearTurnText = () => divTurn.textContent = "";
+
+    const renderText = () => {
       divTurn.textContent = `${Game.getCurrentPlayer().playerName}'s turn...`
 
-      if (Game.checkWinner()) {
-        clearScreen();
-        divGameOver.textContent = `${Game.getCurrentPlayer().playerName} wins the game. Congratulations!!`;
-        return;
-    }
-    if (Game.checkDraw()) {
-        clearScreen();
-        divGameOver.textContent = `Game is a draw.`;
-        return;
+        if (Game.checkWinner()) {
+            clearTurnText();
+            divGameOver.textContent = `${Game.getCurrentPlayer().playerName} wins the game. Congratulations!!`;
+        }
+        if (Game.checkDraw()) {
+            clearTurnText();
+            divGameOver.textContent = `Game is a draw.`;
+        }
     }
 
+    const renderBoard = () => {
     //renders the contents of the board array to the webpage
     //Using data attribute to associate each square with the corresponding board button for clicking
         gameBoard.getBoardValues().forEach((currentValue, index) => {
@@ -233,16 +233,24 @@ const displayController = (() => {
     const handleBoardClicks = (ev) => {
       const playerMove = ev.target.dataset.square;
       
-      //if the blank space around the board squares is clicked, don't make a move
-      if (!playerMove) return;
-      
-      Game.playRound(playerMove);
-      updateScreen();
+        //if the blank space around the board squares is clicked, don't make a move
+        if (!playerMove) return;
+
+        //if there's a winner or draw, only newly render the text
+        if (Game.checkWinner() || Game.checkDraw()) {
+            renderText();
+        }
+
+        Game.playRound(playerMove);
+        clearScreen();
+        renderText();
+        renderBoard();
     }
 
     divBoard.addEventListener("click", handleBoardClicks);
 
-    //intially rendering the screen
-    updateScreen();
+    //intially rendering the text and the board
+    renderText();
+    renderBoard();
     
 })();
