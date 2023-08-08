@@ -63,31 +63,31 @@ const gameBoard = (() => {
 //HANDLES MOVES AND TURNS, AND CHECKS IF THEY ARE VALID
 const Game = (() => {
     let turnCounter = 1;
-    let currentPlayer; 
-    let playerOneName = "";
-    let playerTwoName = "";
+    let currentPlayer, 
+        playerOne, 
+        playerTwo;
 
-        //factory function for making new players
-        const createPlayer = (playerName, markerType) => {
-            return { playerName, markerType }
-        }
-        
+    //factory function for making new players
+    const createPlayer = (playerName, markerType) => {
+        const getName = () => playerName;
+        return { getName, markerType }
+    }
         //these two functions allow the currentPlayer value to be retrieved, or assigned a new value, from other modules while keeping currentPlayer itself private 
         //helps keep code readable and organzied
         const getCurrentPlayer = () => currentPlayer;
         const setCurrentPlayer = (player) => currentPlayer = player;
 
-    while (playerOneName === "" || playerOneName.includes(" ")) {
-        playerOneName = prompt(`Welcome to Tic-Tac-Toe! Enter a name for Player One:`);
-    }
-    while (playerTwoName === "" || playerTwoName.includes(" ")) {
-        playerTwoName = prompt(`Welcome to Tic-Tac-Toe! Enter a name for Player Two:`);
-    }
-    const playerOne = createPlayer(playerOneName, "X", 0);
-    const playerTwo = createPlayer(playerTwoName, "O", 0);
-        
-        //starting the game as Player One
-        setCurrentPlayer(playerOne);
+        const init = () => {
+            console.clear();
+            let playerOneName = prompt(`Welcome to Tic-Tac-Toe! Enter a name for Player One:`);
+            let playerTwoName = prompt(`Welcome to Tic-Tac-Toe! Enter a name for Player Two:`);
+            
+            playerOne = createPlayer(playerOneName, "X");
+            playerTwo = createPlayer(playerTwoName, "O");
+
+            //starting the game as Player One
+            setCurrentPlayer(playerOne);
+        }
 
         const switchTurns = () => {
         console.log(`- Turn #${turnCounter} -`);
@@ -97,7 +97,7 @@ const Game = (() => {
             else if (getCurrentPlayer() === playerTwo) {
                 setCurrentPlayer(playerOne);
             };
-            console.log(`${getCurrentPlayer().playerName}'s turn...`)
+            console.log(`${getCurrentPlayer().getName()}'s turn...`)
         }
 
         const checkWinner = () => {
@@ -143,10 +143,10 @@ const Game = (() => {
             //print game title and blank board on the first turn
             if (turnCounter === 1) {
                 console.log(`-- TIC-TAC-TOE --`);
-                console.log(`Player One: ${playerOneName}`);
-                console.log(`Player Two: ${playerTwoName}`);
+                console.log(`Player One: ${playerOne.getName()}`);
+                console.log(`Player Two: ${playerTwo.getName()}`);
                 console.log(`- Turn ${turnCounter} -`)
-                console.log(`${getCurrentPlayer().playerName}'s turn...`)
+                console.log(`${getCurrentPlayer().getName()}'s turn...`)
                 gameBoard.printBoardToConsole(); 
             }
             
@@ -160,7 +160,7 @@ const Game = (() => {
                 gameBoard.printBoardToConsole();
                 //checking for winner or draw before switching turns
                 if (checkWinner()) {
-                    console.log(`${getCurrentPlayer().playerName} wins the game. Congratulations!!`);
+                    console.log(`${getCurrentPlayer().getName()} wins the game. Congratulations!!`);
                     return;
                 }
                 if (checkDraw()) {
@@ -176,22 +176,26 @@ const Game = (() => {
     
     }
 
-    //playRound is a recursive function, calling itself indefinitely with a 2 second timeout delay after each round until a winner is found
-    const play = () => {
-        if (turnCounter === 1) {
-            setTimeout(playRound, 1500);
-        }
-        playRound();
-    }
-
-    return { getCurrentPlayer, setCurrentPlayer, checkWinner, checkDraw, playRound, play }
+    return { init, getCurrentPlayer, setCurrentPlayer, checkWinner, checkDraw, playRound }
 })();
 
 //HANDLES THE GRAPHICAL USER INTERFACE AND UPDATING THE SCREEN
 const displayController = (() => {
+    const headerTitle = document.querySelector(`#game-title`);
+    const btnStart = document.createElement(`button`);
+    btnStart.textContent = `Start Game`
+    headerTitle.appendChild(btnStart);
     const divTurn = document.querySelector('#player-turns');
     const divBoard = document.querySelector('#game-board');
     const divGameOver = document.querySelector(`#game-over`);
+
+    const start = () => {
+        console.clear()
+        Game.init();
+        renderText();
+        renderBoard();
+        btnStart.remove();
+    }
 
     const clearScreen = () => {
         divTurn.textContent = "";
@@ -202,11 +206,11 @@ const displayController = (() => {
     const clearTurnText = () => divTurn.textContent = "";
 
     const renderText = () => {
-      divTurn.textContent = `${Game.getCurrentPlayer().playerName}'s turn...`
+      divTurn.textContent = `${Game.getCurrentPlayer().getName()}'s turn...`
 
         if (Game.checkWinner()) {
             clearTurnText();
-            divGameOver.textContent = `${Game.getCurrentPlayer().playerName} wins the game. Congratulations!!`;
+            divGameOver.textContent = `${Game.getCurrentPlayer().getName()} wins the game. Congratulations!!`;
         }
         if (Game.checkDraw()) {
             clearTurnText();
@@ -227,6 +231,7 @@ const displayController = (() => {
 
               divBoard.appendChild(btnSquare);
           })
+          divBoard.addEventListener("click", handleBoardClicks);
         }
 
     //Handler to place moves/markers for each round wherever the player clicks
@@ -247,10 +252,5 @@ const displayController = (() => {
         renderBoard();
     }
 
-    divBoard.addEventListener("click", handleBoardClicks);
-
-    //intially rendering the text and the board
-    renderText();
-    renderBoard();
-    
+    btnStart.addEventListener("click", () => start());
 })();

@@ -3,10 +3,16 @@
 }
 
 h1 {
+    display: grid;
     font-size: 3rem;
     text-align: center;
     padding: 10px;
     margin: 20px;
+}
+
+button {
+    font-size: 1.5rem;
+    font-weight: bolder;
 }
 
 .square {
