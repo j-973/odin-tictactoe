@@ -20,8 +20,9 @@ const gameBoard = (() => {
         //returns the current value of squareValue for other functions that need it for filtering or printing to console
         //would be an empty string (no selection), an X, or an O.  
         const getSquareValue = () => squareValue;
+        const setSquareValue = (newSquareValue) => squareValue = newSquareValue;
 
-        return { addMarkerSelection, getSquareValue }
+        return { addMarkerSelection, getSquareValue, setSquareValue }
     }
 
     for (let i = 0; i < numOfSquares; i++) {
@@ -30,6 +31,8 @@ const gameBoard = (() => {
 
     //Map the board array to a new array containing just the values of the board squares
     const getBoardValues = () => board.map(square => square.getSquareValue());
+
+    const clearSquares = () => board.map(square => square.setSquareValue(""));
     
     //filter creates new array of just squares with empty strings (to find available squares) 
     const getAvailableSquares = () => board.filter(square => square.getSquareValue() === "");
@@ -57,7 +60,7 @@ const gameBoard = (() => {
         console.log(formattedBoard);
     };
 
-    return { addMarker, getBoardValues, getAvailableSquares, printBoardToConsole };
+    return { addMarker, getBoardValues, clearSquares, getAvailableSquares, printBoardToConsole };
 })();
 
 //HANDLES MOVES AND TURNS, AND CHECKS IF THEY ARE VALID
@@ -79,6 +82,7 @@ const Game = (() => {
 
         const init = () => {
             console.clear();
+            turnCounter = 1;
             let playerOneName = prompt(`Welcome to Tic-Tac-Toe! Enter a name for Player One:`);
             let playerTwoName = prompt(`Welcome to Tic-Tac-Toe! Enter a name for Player Two:`);
             
@@ -145,7 +149,7 @@ const Game = (() => {
                 console.log(`-- TIC-TAC-TOE --`);
                 console.log(`Player One: ${playerOne.getName()}`);
                 console.log(`Player Two: ${playerTwo.getName()}`);
-                console.log(`- Turn ${turnCounter} -`)
+                console.log(`- Turn #${turnCounter} -`)
                 console.log(`${getCurrentPlayer().getName()}'s turn...`)
                 gameBoard.printBoardToConsole(); 
             }
@@ -183,24 +187,25 @@ const Game = (() => {
 const displayController = (() => {
     const headerTitle = document.querySelector(`#game-title`);
     const btnStart = document.createElement(`button`);
-    btnStart.textContent = `Start Game`
-    headerTitle.appendChild(btnStart);
+        btnStart.textContent = `Start Game`
+        headerTitle.appendChild(btnStart);
     const divTurn = document.querySelector('#player-turns');
     const divBoard = document.querySelector('#game-board');
     const divGameOver = document.querySelector(`#game-over`);
-
-    const start = () => {
-        console.clear()
-        Game.init();
-        renderText();
-        renderBoard();
-        btnStart.remove();
-    }
 
     const clearScreen = () => {
         divTurn.textContent = "";
         divBoard.textContent = "";
         divGameOver.textContent = "";
+    }
+
+    const start = () => {
+        gameBoard.clearSquares();
+        clearScreen();
+        Game.init();
+        renderText();
+        renderBoard();
+        btnStart.remove();
     }
 
     const clearTurnText = () => divTurn.textContent = "";
@@ -211,10 +216,14 @@ const displayController = (() => {
         if (Game.checkWinner()) {
             clearTurnText();
             divGameOver.textContent = `${Game.getCurrentPlayer().getName()} wins the game. Congratulations!!`;
+            btnStart.textContent = `Play Again?`
+            headerTitle.appendChild(btnStart);
         }
         if (Game.checkDraw()) {
             clearTurnText();
             divGameOver.textContent = `Game is a draw.`;
+            btnStart.textContent = `Play Again?`
+            headerTitle.appendChild(btnStart);
         }
     }
 
