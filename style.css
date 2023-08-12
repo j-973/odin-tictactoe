@@ -4,6 +4,7 @@
 
 h1 {
     display: grid;
+    justify-content: center;
     font-size: 3rem;
     text-align: center;
     padding: 10px;
@@ -13,6 +14,10 @@ h1 {
 button {
     font-size: 1.5rem;
     font-weight: bolder;
+}
+
+.hide {
+    display: none;
 }
 
 .square {
@@ -27,6 +32,10 @@ button {
 .square:hover {
     background-color: silver;
     cursor: pointer;
+}
+
+#player-names {
+    display: grid;
 }
 
 #game-board {

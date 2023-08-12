@@ -83,8 +83,8 @@ const Game = (() => {
         const init = () => {
             console.clear();
             turnCounter = 1;
-            let playerOneName = prompt(`Welcome to Tic-Tac-Toe! Enter a name for Player One:`);
-            let playerTwoName = prompt(`Welcome to Tic-Tac-Toe! Enter a name for Player Two:`);
+            let playerOneName = document.querySelector(`#player-one-name`).value;
+            let playerTwoName = document.querySelector(`#player-two-name`).value;
             
             playerOne = createPlayer(playerOneName, "X");
             playerTwo = createPlayer(playerTwoName, "O");
@@ -189,6 +189,7 @@ const displayController = (() => {
     const btnStart = document.createElement(`button`);
         btnStart.textContent = `Start Game`
         headerTitle.appendChild(btnStart);
+    const playerNameEntry = document.querySelector(`#player-form`);
     const divTurn = document.querySelector('#player-turns');
     const divBoard = document.querySelector('#game-board');
     const divGameOver = document.querySelector(`#game-over`);
@@ -197,6 +198,9 @@ const displayController = (() => {
         divTurn.textContent = "";
         divBoard.textContent = "";
         divGameOver.textContent = "";
+        if (!playerNameEntry.classList.contains(`hide`)) {
+            playerNameEntry.classList.add(`hide`);
+        }
     }
 
     const start = () => {
@@ -217,12 +221,15 @@ const displayController = (() => {
             clearTurnText();
             divGameOver.textContent = `${Game.getCurrentPlayer().getName()} wins the game. Congratulations!!`;
             btnStart.textContent = `Play Again?`
+            playerNameEntry.classList.remove('hide');
             headerTitle.appendChild(btnStart);
         }
         if (Game.checkDraw()) {
             clearTurnText();
             divGameOver.textContent = `Game is a draw.`;
             btnStart.textContent = `Play Again?`
+            headerTitle.appendChild(btnStart);
+            playerNameEntry.classList.remove('hide');
             headerTitle.appendChild(btnStart);
         }
     }
