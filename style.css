@@ -2,18 +2,26 @@
     box-sizing: border-box;
 }
 
+body {
+    font-size: 1.75rem;
+}
+
 h1 {
     display: grid;
     justify-content: center;
-    font-size: 3rem;
+    font-size: 3.5rem;
     text-align: center;
     padding: 10px;
     margin: 20px;
 }
 
 button {
-    font-size: 1.5rem;
-    font-weight: bolder;
+    font-size: 2rem;
+    font-weight: 900;
+}
+
+div, input {
+    font-size: 1.75rem;
 }
 
 .hide {
@@ -32,10 +40,17 @@ button {
 .square:hover {
     background-color: silver;
     cursor: pointer;
+    width: 103%;
+    height: 103%;
+    transition: 0.2s;
 }
 
 #player-names {
     display: grid;
+}
+
+#game-over {
+    font-weight: 700;
 }
 
 #game-board {
@@ -46,4 +61,8 @@ button {
     width: 35rem;
     margin: 0 auto;
     gap: 0.5rem;
+}
+
+#P-One, #P-Two, #game-over {
+    padding: 5px 5px 10px 5px
 }
