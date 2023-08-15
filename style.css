@@ -1,5 +1,11 @@
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url(./fonts/press-start-2p-font/PressStart2P-vaV7.ttf) format('truetype');
+}
+
 * {
     box-sizing: border-box;
+    font-family: 'Press Start 2P', cursive;
 }
 
 body {
@@ -9,19 +15,19 @@ body {
 h1 {
     display: grid;
     justify-content: center;
-    font-size: 3.5rem;
+    font-size: 2rem;
     text-align: center;
     padding: 10px;
     margin: 20px;
 }
 
 button {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 900;
 }
 
 div, input {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
 }
 
 .hide {
