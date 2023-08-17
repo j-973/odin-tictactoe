@@ -188,11 +188,18 @@ const displayController = (() => {
     const headerTitle = document.querySelector(`#game-title`);
     const btnStart = document.createElement(`button`);
         btnStart.textContent = `Start Game`
+        btnStart.setAttribute('id', 'btn-start');
         headerTitle.appendChild(btnStart);
     const playerNameEntry = document.querySelector(`#player-form`);
-    const divTurn = document.querySelector('#player-turns');
-    const divBoard = document.querySelector('#game-board');
-    const divGameOver = document.querySelector(`#game-over`);
+
+    const divTurn = document.createElement('div');
+        divTurn.setAttribute('id', '#player-turns');
+
+    const divGameOver = document.createElement('div')
+        divGameOver.setAttribute('id', 'game-over');
+
+    const divBoard = document.createElement('div');
+        divBoard.setAttribute('id', 'game-board');
 
     const clearScreen = () => {
         divTurn.textContent = "";
@@ -205,6 +212,16 @@ const displayController = (() => {
 
     const start = () => {
         gameBoard.clearSquares();
+        //adding divs on the page at game start, hiding game over message if added from a previous game round
+        if (!divTurn.parentNode) {
+            document.body.appendChild(divTurn);
+        }
+        if (divGameOver.parentNode) {
+            divGameOver.classList.add('hide');
+        }
+        if (!divBoard.parentNode) {
+            document.body.appendChild(divBoard);
+        }
         clearScreen();
         Game.init();
         renderText();
@@ -219,14 +236,22 @@ const displayController = (() => {
 
         if (Game.checkWinner()) {
             clearTurnText();
+            divTurn.appendChild(divGameOver);
             divGameOver.textContent = `${Game.getCurrentPlayer().getName()} wins the game. Congratulations!!`;
+            if (divGameOver.classList.contains('hide')) {
+                divGameOver.classList.remove('hide');
+            }
             btnStart.textContent = `Play Again?`
             playerNameEntry.classList.remove('hide');
             headerTitle.appendChild(btnStart);
         }
         if (Game.checkDraw()) {
             clearTurnText();
+            divTurn.appendChild(divGameOver);
             divGameOver.textContent = `Game is a draw.`;
+            if (divGameOver.classList.contains('hide')) {
+                divGameOver.classList.remove('hide');
+            }
             btnStart.textContent = `Play Again?`
             headerTitle.appendChild(btnStart);
             playerNameEntry.classList.remove('hide');

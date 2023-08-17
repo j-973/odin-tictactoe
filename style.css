@@ -1,3 +1,11 @@
+:root {
+    --bg-sky-light: #A4FFFF;
+    --bg-sky: #70FFFF;
+    --neon-green: #00FF00;
+    --neon-green-active: #00AD00;
+    --neon-yellow-green: #AAFF00;
+}
+
 @font-face {
     font-family: 'Press Start 2P';
     src: url(./fonts/press-start-2p-font/PressStart2P-vaV7.ttf) format('truetype');
@@ -10,6 +18,8 @@
 
 body {
     font-size: 1.75rem;
+    background-color: var(--bg-sky-light);
+    background-image: linear-gradient(to left, white, var(--bg-sky-light), var(--bg-sky));
 }
 
 h1 {
@@ -17,17 +27,18 @@ h1 {
     justify-content: center;
     font-size: 2rem;
     text-align: center;
+    text-decoration: underline;
     padding: 10px;
     margin: 20px;
 }
 
 button {
-    font-size: 1.5rem;
-    font-weight: 900;
+    font-size: 1.25rem;
 }
 
 div, input {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
+    padding: 5px
 }
 
 .hide {
@@ -38,37 +49,66 @@ div, input {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: whitesmoke;
+    background-color: white;
+    font-size: 3rem;
     border: 2px solid black;
     border-radius: 5px;
 }
+    .square:hover {
+        background-color: silver;
+        cursor: pointer;
+        width: 102%;
+        height: 102%;
+        transition: 50ms;
+    }
 
-.square:hover {
-    background-color: silver;
+#btn-start {
+    font-size: 1.5rem;
+    background-color: var(--neon-green);
+    color: black;
     cursor: pointer;
-    width: 103%;
-    height: 103%;
-    transition: 0.2s;
+    text-decoration: none;
+    box-shadow: 4px 4px 0px;
+    padding: 10px;
+    margin: 15px 10px;
 }
+    #btn-start:hover {
+        background-color: var(--neon-green-active);
+        box-shadow: inset 2px 2px 2px;
+        transition: 50ms;
+    }
 
 #player-names {
     display: grid;
-}
-
-#game-over {
-    font-weight: 700;
 }
 
 #game-board {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr;
-    height: 35rem;
-    width: 35rem;
-    margin: 0 auto;
+    background-color: whitesmoke;
+    height: 30rem;
+    width: 30rem;
+    border: 4px solid white;
+    border-radius: 10px;
+    box-shadow: 4px 4px 0px;
+    margin: 20px auto;
     gap: 0.5rem;
 }
 
+#game-over {
+    background-color: var(--neon-yellow-green);
+    width: fit-content;
+    border-radius: 5px;
+    box-shadow: 4px 4px 0px;
+}
+
+#btn-start, .square, input {
+    border: 2px solid black;
+    border-radius: 10px;
+}
+
 #P-One, #P-Two, #game-over {
-    padding: 5px 5px 10px 5px
+    padding: 5px;
+    margin-bottom: 10px;
 }
