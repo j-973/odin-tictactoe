@@ -201,13 +201,22 @@ const displayController = (() => {
     const divBoard = document.createElement('div');
         divBoard.setAttribute('id', 'game-board');
 
+    const showElement = (elementName) => {
+        if (elementName.classList.contains('hide')) {
+            elementName.classList.remove('hide');
+        } 
+    }
+    const hideElement = (elementName) => {
+        if (!elementName.classList.contains(`hide`)) {
+            elementName.classList.add(`hide`);
+        } 
+    }
+    
     const clearScreen = () => {
         divTurn.textContent = "";
         divBoard.textContent = "";
         divGameOver.textContent = "";
-        if (!playerNameEntry.classList.contains(`hide`)) {
-            playerNameEntry.classList.add(`hide`);
-        }
+        hideElement(playerNameEntry);
     }
 
     const start = () => {
@@ -236,25 +245,20 @@ const displayController = (() => {
 
         if (Game.checkWinner()) {
             clearTurnText();
-            divTurn.appendChild(divGameOver);
             divGameOver.textContent = `${Game.getCurrentPlayer().getName()} wins the game. Congratulations!!`;
-            if (divGameOver.classList.contains('hide')) {
-                divGameOver.classList.remove('hide');
-            }
+            divTurn.appendChild(divGameOver);
+            showElement(divGameOver);
             btnStart.textContent = `Play Again?`
-            playerNameEntry.classList.remove('hide');
+            showElement(playerNameEntry);
             headerTitle.appendChild(btnStart);
         }
         if (Game.checkDraw()) {
             clearTurnText();
-            divTurn.appendChild(divGameOver);
             divGameOver.textContent = `Game is a draw.`;
-            if (divGameOver.classList.contains('hide')) {
-                divGameOver.classList.remove('hide');
-            }
+            divTurn.appendChild(divGameOver);
+            showElement(divGameOver);
             btnStart.textContent = `Play Again?`
-            headerTitle.appendChild(btnStart);
-            playerNameEntry.classList.remove('hide');
+            showElement(playerNameEntry);
             headerTitle.appendChild(btnStart);
         }
     }
