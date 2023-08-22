@@ -17,7 +17,7 @@
 }
 
 body {
-    font-size: 1.75rem;
+    font-size: clamp(16px, 1vw, 1vw);
     background-color: var(--bg-sky-light);
     background-image: linear-gradient(to left, white, var(--bg-sky-light), var(--bg-sky));
 }
@@ -33,18 +33,18 @@ h1 {
 }
 
 button {
-    font-size: 1.25rem;
+    font-size: 1em;
 }
 
 div, input {
-    font-size: 1.25rem;
+    font-size: 1em;
     padding: 5px
 }
 
 input[type=color] {
     cursor: pointer;
-    width: 4rem;
-    height: 4rem;
+    width: 4em;
+    height: 4em;
     margin: 5px;
 }
 
@@ -57,7 +57,7 @@ input[type=color] {
     justify-content: center;
     align-items: center;
     background-color: white;
-    font-size: 3rem;
+    font-size: 3em;
 }
     .square:hover {
         background-color: silver;
@@ -68,11 +68,13 @@ input[type=color] {
     }
 
 #btn-start {
-    font-size: 1.5rem;
+    font-size: 0.75em;
     background-color: var(--neon-green);
     color: black;
     cursor: pointer;
     text-decoration: none;
+    width: 15em;
+    height: 2em;
     box-shadow: 4px 4px 0px;
     padding: 10px;
     margin: 15px 10px;
@@ -83,17 +85,23 @@ input[type=color] {
         transition: 50ms;
     }
 
-#player-names, #colors-container {
+#player-names {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(425px, 1fr));
     grid-template-rows: auto;
 }
 
-div#player-one-color, div#player-two-color {
-    display: flex;
-    flex-direction: column;
+#colors-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     justify-content: center;
+    justify-items: center;
     align-items: center;
+    text-align: center;
+}
+
+div#player-one-color, div#player-two-color {
+    display: grid;
 }
 
 #game-board {
@@ -101,18 +109,19 @@ div#player-one-color, div#player-two-color {
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr;
     background-color: whitesmoke;
-    height: 30rem;
-    width: 30rem;
+    height: 22em;
+    width: 22em;
     border: 4px solid white;
     border-radius: 10px;
     box-shadow: 4px 4px 0px;
     margin: 20px auto;
-    gap: 0.5rem;
+    gap: 0.25em;
 }
 
 #game-over {
     background-color: var(--neon-yellow-green);
     width: fit-content;
+    text-align: center;
     border-radius: 5px;
     box-shadow: 4px 4px 0px;
 }
