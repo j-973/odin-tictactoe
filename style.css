@@ -41,6 +41,13 @@ div, input {
     padding: 5px
 }
 
+input[type=color] {
+    cursor: pointer;
+    width: 4rem;
+    height: 4rem;
+    margin: 5px;
+}
+
 .hide {
     display: none;
 }
@@ -51,8 +58,6 @@ div, input {
     align-items: center;
     background-color: white;
     font-size: 3rem;
-    border: 2px solid black;
-    border-radius: 5px;
 }
     .square:hover {
         background-color: silver;
@@ -78,8 +83,17 @@ div, input {
         transition: 50ms;
     }
 
-#player-names {
+#player-names, #colors-container {
     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    grid-template-rows: auto;
+}
+
+div#player-one-color, div#player-two-color {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 #game-board {
@@ -108,7 +122,7 @@ div, input {
     border-radius: 10px;
 }
 
-#P-One, #P-Two, #game-over {
+#player-one, #player-two, #game-over {
     padding: 5px;
     margin-bottom: 10px;
 }
