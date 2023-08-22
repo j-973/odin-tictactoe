@@ -71,9 +71,10 @@ const Game = (() => {
         playerTwo;
 
     //factory function for making new players
-    const createPlayer = (playerName, markerType) => {
+    const createPlayer = (playerName, markerType, playerColor) => {
         const getName = () => playerName;
-        return { getName, markerType }
+        const getColor = () => playerColor;
+        return { getName, markerType, getColor }
     }
         //these two functions allow the currentPlayer value to be retrieved, or assigned a new value, from other modules while keeping currentPlayer itself private 
         //helps keep code readable and organzied
@@ -85,13 +86,19 @@ const Game = (() => {
             turnCounter = 1;
             let playerOneName = document.querySelector(`#player-one-name`).value;
             let playerTwoName = document.querySelector(`#player-two-name`).value;
+
+            let playerOneColor = document.querySelector('#player-one-picker').value; 
+            let playerTwoColor = document.querySelector('#player-two-picker').value;
             
-            playerOne = createPlayer(playerOneName, "X");
-            playerTwo = createPlayer(playerTwoName, "O");
+            playerOne = createPlayer(playerOneName, "X", playerOneColor);
+            playerTwo = createPlayer(playerTwoName, "O", playerTwoColor);
 
             //starting the game as Player One
             setCurrentPlayer(playerOne);
         }
+
+        const getPlayerOne = () => playerOne;
+        const getPlayerTwo = () => playerTwo;
 
         const switchTurns = () => {
         console.log(`- Turn #${turnCounter} -`);
@@ -180,7 +187,7 @@ const Game = (() => {
     
     }
 
-    return { init, getCurrentPlayer, setCurrentPlayer, checkWinner, checkDraw, playRound }
+    return { init, getCurrentPlayer, setCurrentPlayer, getPlayerOne, getPlayerTwo, checkWinner, checkDraw, playRound }
 })();
 
 //HANDLES THE GRAPHICAL USER INTERFACE AND UPDATING THE SCREEN
@@ -192,12 +199,40 @@ const displayController = (() => {
         headerTitle.appendChild(btnStart);
     const playerNameEntry = document.querySelector(`#player-form`);
 
+    //color pickers and their labels
+    const divColors = document.createElement('div');
+        divColors.setAttribute('id', 'colors-container');
+        playerNameEntry.appendChild(divColors);
+
+    const divPlayerOneColor = document.createElement('div');
+        divPlayerOneColor.setAttribute('id', 'player-one-color');
+        const playerOneColorLabel = document.createElement('label');
+        playerOneColorLabel.textContent = 'P1';
+    const playerOneColorPicker = document.createElement('input');
+            playerOneColorPicker.setAttribute('type', 'color');
+            playerOneColorPicker.setAttribute('id', 'player-one-picker');
+            playerOneColorPicker.defaultValue = "#ff3837";
+                divPlayerOneColor.appendChild(playerOneColorLabel);
+                divPlayerOneColor.appendChild(playerOneColorPicker);
+                divColors.appendChild(divPlayerOneColor);
+    
+    const divPlayerTwoColor = document.createElement('div');
+        divPlayerTwoColor.setAttribute('id', 'player-two-color');
+        const playerTwoColorLabel = document.createElement('label');
+        playerTwoColorLabel.textContent = 'P2';
+    const playerTwoColorPicker = document.createElement('input');
+            playerTwoColorPicker.setAttribute('type', 'color');
+            playerTwoColorPicker.setAttribute('id', 'player-two-picker')
+            playerTwoColorPicker.defaultValue = "#308aff";
+                divPlayerTwoColor.appendChild(playerTwoColorLabel);
+                divPlayerTwoColor.appendChild(playerTwoColorPicker);
+                divColors.appendChild(divPlayerTwoColor);
+
+    //game divs
     const divTurn = document.createElement('div');
         divTurn.setAttribute('id', '#player-turns');
-
     const divGameOver = document.createElement('div')
         divGameOver.setAttribute('id', 'game-over');
-
     const divBoard = document.createElement('div');
         divBoard.setAttribute('id', 'game-board');
 
@@ -217,6 +252,7 @@ const displayController = (() => {
         divBoard.textContent = "";
         divGameOver.textContent = "";
         hideElement(playerNameEntry);
+        hideElement(divColors);
     }
 
     const start = () => {
@@ -250,6 +286,7 @@ const displayController = (() => {
             showElement(divGameOver);
             btnStart.textContent = `Play Again?`
             showElement(playerNameEntry);
+            showElement(divColors);
             headerTitle.appendChild(btnStart);
         }
         if (Game.checkDraw()) {
@@ -259,6 +296,7 @@ const displayController = (() => {
             showElement(divGameOver);
             btnStart.textContent = `Play Again?`
             showElement(playerNameEntry);
+            showElement(divColors);
             headerTitle.appendChild(btnStart);
         }
     }
@@ -273,6 +311,15 @@ const displayController = (() => {
               btnSquare.dataset.square = index; 
 
               btnSquare.textContent = currentValue;
+
+              switch (currentValue) {
+                case Game.getPlayerOne().markerType:
+                    btnSquare.style.color = Game.getPlayerOne().getColor();
+                    break;
+                case Game.getPlayerTwo().markerType:
+                    btnSquare.style.color = Game.getPlayerTwo().getColor();
+                    break;
+              }
 
               divBoard.appendChild(btnSquare);
           })
