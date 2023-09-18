@@ -20,6 +20,8 @@ body {
     font-size: clamp(16px, 1vw, 1vw);
     background-color: var(--bg-sky-light);
     background-image: linear-gradient(to left, white, var(--bg-sky-light), var(--bg-sky));
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
 h1 {
